@@ -1,0 +1,19 @@
+# Aldelo → Convex sync service config
+# Copy to config.toml and set paths for your POS machine.
+# Optional: set CONVEX_URL and CONVEX_API_KEY in the environment (e.g. NSSM "App environment").
+
+mdb_path = "C:\\Aldelo\\Data\\ChathamSandwich.mdb"
+convex_url = "https://your-deployment.convex.site/api/ingest_orders"
+cursor_path = "C:\\AldeloSync\\cursor.json"
+
+# Poll every 5 seconds when healthy
+poll_interval_secs = 5
+
+# On MDB lock/error: quick retries then exponential backoff
+backoff_initial_secs = 10
+backoff_multiplier = 2
+backoff_max_secs = 60
+quick_retries = 2
+
+# Rows per batch (OrderHeaders; related transactions/payments/refunds fetched for same orders)
+batch_size = 200
