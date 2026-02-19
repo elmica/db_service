@@ -21,6 +21,7 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 # database backups and large data files
 *.mdb
 *.accdb
+*.csv
 
 # dotenv environment variable files
 .env
