@@ -16,4 +16,4 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 [target.'cfg(windows)'.dependencies]
-odbc-api = "0.40"
+odbc-api = "20"
