@@ -5,6 +5,7 @@ Read-only MDB access; incremental sync with cursor file; exponential backoff on 
 Run as Windows service via NSSM on the POS machine.
 """
 
+import configparser
 import json
 import os
 import sys
@@ -18,37 +19,38 @@ import requests
 # ---------- Config ----------
 
 def load_config(config_path=None):
-    """Load config from TOML file. Uses tomllib (Python 3.11+) or tomli."""
-    path = config_path or os.environ.get("ALDELO_SYNC_CONFIG", "config.toml")
+    """Load config from config.ini file."""
+    path = config_path or os.environ.get("ALDELO_SYNC_CONFIG", "config.ini")
     if not Path(path).exists():
         raise FileNotFoundError(f"Config not found: {path}")
 
-    try:
-        import tomllib
-        with open(path, "rb") as f:
-            raw = tomllib.load(f)
-    except ImportError:
-        try:
-            import tomli as tomllib
-            with open(path, "rb") as f:
-                raw = tomllib.load(f)
-        except ImportError:
-            raise ImportError("Need tomli for Python < 3.11: pip install tomli")
+    cp = configparser.ConfigParser()
+    cp.read(path)
 
-    # TOML may have top-level keys or a [sync] section
-    cfg = raw.get("sync", raw) if isinstance(raw, dict) else raw
+    # Use [sync] section; fall back to [database] for connection_string (shared with testapp)
+    sync = dict(cp["sync"]) if cp.has_section("sync") else {}
+    database = dict(cp["database"]) if cp.has_section("database") else {}
+
+    def get(key, default=""):
+        return sync.get(key, database.get(key, default))
+
+    def getint(key, default=0):
+        try:
+            return int(sync.get(key, database.get(key, str(default))))
+        except (ValueError, TypeError):
+            return default
 
     return {
-        "mdb_path": cfg.get("mdb_path", "C:\\Aldelo\\Data\\ChathamSandwich.mdb"),
-        "connection_string": cfg.get("connection_string"),  # optional; if set, use as-is (like testapp config.ini)
-        "convex_url": os.environ.get("CONVEX_URL") or cfg.get("convex_url", ""),
-        "cursor_path": cfg.get("cursor_path", "C:\\AldeloSync\\cursor.json"),
-        "poll_interval_secs": int(cfg.get("poll_interval_secs", 5)),
-        "backoff_initial_secs": int(cfg.get("backoff_initial_secs", 10)),
-        "backoff_multiplier": int(cfg.get("backoff_multiplier", 2)),
-        "backoff_max_secs": int(cfg.get("backoff_max_secs", 60)),
-        "quick_retries": int(cfg.get("quick_retries", 2)),
-        "batch_size": int(cfg.get("batch_size", 200)),
+        "mdb_path": get("mdb_path", "C:\\Aldelo\\Data\\ChathamSandwich.mdb"),
+        "connection_string": get("connection_string") or None,
+        "convex_url": os.environ.get("CONVEX_URL") or get("convex_url", ""),
+        "cursor_path": get("cursor_path", "C:\\AldeloSync\\cursor.json"),
+        "poll_interval_secs": getint("poll_interval_secs", 5),
+        "backoff_initial_secs": getint("backoff_initial_secs", 10),
+        "backoff_multiplier": getint("backoff_multiplier", 2),
+        "backoff_max_secs": getint("backoff_max_secs", 60),
+        "quick_retries": getint("quick_retries", 2),
+        "batch_size": getint("batch_size", 200),
     }
 
 

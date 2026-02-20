@@ -20,7 +20,7 @@ pip install -r requirements.txt
 ## Install the service
 
 1. Create a directory for config and cursor, e.g. `C:\AldeloSync\`.
-2. Copy `sync_service/config.toml.example` to `C:\AldeloSync\config.toml` and edit:
+2. Copy `sync_service/config.ini.example` to `C:\AldeloSync\config.ini` and edit:
    - `mdb_path`: full path to the Aldelo .mdb file.
    - `convex_url`: your Convex ingestion endpoint URL.
    - `cursor_path`: e.g. `C:\AldeloSync\cursor.json`.
@@ -41,11 +41,11 @@ Adjust paths to match your setup.
 4. In NSSM GUI (or via command line):
    - **Path**: `python.exe` (or full path).
    - **Arguments**: full path to `aldelo_convex_sync.py`.
-   - **Startup directory**: `C:\AldeloSync` (or where config.toml and cursor live). The script looks for `config.toml` in the current directory by default; set `ALDELO_SYNC_CONFIG=C:\AldeloSync\config.toml` in environment if needed.
+   - **Startup directory**: `C:\AldeloSync` (or where config.ini and cursor live). The script looks for `config.ini` in the current directory by default; set `ALDELO_SYNC_CONFIG=C:\AldeloSync\config.ini` in environment if needed.
    - **Environment**: add if needed:
      - `CONVEX_URL=https://your-deployment.convex.site/api/...`
      - `CONVEX_API_KEY=your-secret-key`
-     - `ALDELO_SYNC_CONFIG=C:\AldeloSync\config.toml`
+     - `ALDELO_SYNC_CONFIG=C:\AldeloSync\config.ini`
 
 5. **Restart** tab: set "Restart service after failure" and delay (e.g. 5 seconds).
 
@@ -72,7 +72,7 @@ If you get `[Microsoft][ODBC Microsoft Access Driver] Disk or network error`:
 
 2. **Use a user account instead of Local System** — The Jet driver creates temp files. Local System may have permission issues. In NSSM: **Log on** tab → select "This account" → enter a user account that has read access to the .mdb (e.g. the same user who runs Aldelo or the Python bridge).
 
-3. **Verify the path** — Ensure `mdb_path` in config.toml is an absolute path and the file exists: `C:\Chatham\ChathamSandwich.mdb`. Use double backslashes in TOML: `mdb_path = "C:\\Chatham\\ChathamSandwich.mdb"`.
+3. **Verify the path** — Ensure `connection_string` or `mdb_path` in config.ini points to the correct .mdb file: `C:\Chatham\ChathamSandwich.mdb`.
 
 4. **File locking** — If Aldelo has the .mdb open exclusively, the sync cannot connect. Ensure Aldelo allows shared read access, or run the sync when Aldelo is idle.
 

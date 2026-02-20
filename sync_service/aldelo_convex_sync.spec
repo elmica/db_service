@@ -9,8 +9,7 @@ a = Analysis(
     hiddenimports=[
         'pyodbc',
         'requests',
-        'tomllib',
-        'tomli',
+        'configparser',
     ],
     hookspath=[],
     hooksconfig={},

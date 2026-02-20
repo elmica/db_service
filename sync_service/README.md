@@ -19,14 +19,14 @@ See [NSSM.md](NSSM.md) for installing and running as a Windows service.
 2. Copy it to your POS machine (e.g. `C:\AldeloSync\`).
 
 **Config (both options)**
-3. Copy `config.toml.example` (in this folder) to `config.toml` and set:
-   - `mdb_path`: full path to the Aldelo .mdb file
-   - `convex_url`: your Convex ingestion endpoint URL
-   - `cursor_path`: path for the cursor file (e.g. `C:\AldeloSync\cursor.json`)
+3. Copy `config.ini.example` (in this folder) to `config.ini` and set:
+   - `[database] connection_string`: same as testapp (or `mdb_path` in `[sync]`)
+   - `[sync] convex_url`: your Convex ingestion endpoint URL
+   - `[sync] cursor_path`: path for the cursor file (e.g. `C:\AldeloSync\cursor.json`)
 
 4. Optionally set `CONVEX_URL` and `CONVEX_API_KEY` in the environment.
 
-**If you get "Data source name not found" (IM002):** Your testapp uses 32-bit Python. Use the **x86 (32-bit)** artifact, or add `connection_string` to config.toml (copy the value from your working `config.ini`).
+**If you get "Data source name not found" (IM002):** Your testapp uses 32-bit Python. Use the **x86 (32-bit)** artifact, or ensure `connection_string` is in your `config.ini` (same format as testapp).
 
 ## Run
 
@@ -42,8 +42,8 @@ aldelo-convex-sync.exe
 
 Pass a config path as first argument if needed:
 ```bash
-python aldelo_convex_sync.py C:\AldeloSync\config.toml
-aldelo-convex-sync.exe C:\AldeloSync\config.toml
+python aldelo_convex_sync.py C:\AldeloSync\config.ini
+aldelo-convex-sync.exe C:\AldeloSync\config.ini
 ```
 
 ## Convex

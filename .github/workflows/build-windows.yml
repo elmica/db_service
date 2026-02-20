@@ -32,8 +32,8 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies (requests, tomli for Python < 3.11)
-        run: pip install requests tomli
+      - name: Install dependencies
+        run: pip install requests
 
       - name: Validate syntax
         run: python -m py_compile aldelo_convex_sync.py

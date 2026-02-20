@@ -9,7 +9,7 @@ REM Option B: Use Python script
 set PYTHON_PATH=python
 set SCRIPT_PATH=%~dp0sync_service\aldelo_convex_sync.py
 set WORK_DIR=C:\AldeloSync
-set CONFIG_PATH=C:\AldeloSync\config.toml
+set CONFIG_PATH=C:\AldeloSync\config.ini
 
 REM Check NSSM is on PATH or set full path, e.g. set NSSM=C:\tools\nssm.exe
 where nssm >nul 2>&1 || set NSSM=nssm.exe
