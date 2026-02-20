@@ -7,6 +7,7 @@ Run as Windows service via NSSM on the POS machine.
 
 import json
 import os
+import sys
 import time
 from pathlib import Path
 
@@ -341,7 +342,6 @@ def run_one_poll(config, cursor, cursor_path):
 
 
 def main():
-    import sys
     config_path = sys.argv[1] if len(sys.argv) > 1 else None
     config = load_config(config_path)
     cursor_path = config["cursor_path"]
@@ -385,4 +385,4 @@ def main():
 
 
 if __name__ == "__main__":
-    exit(main())
+    sys.exit(main())
