@@ -313,7 +313,7 @@ Optional: check `Authorization: Bearer <CONVEX_API_KEY>` in the handler and reje
 
 ## 6. Sync service config reminder
 
-In the machine running the Rust sync service, set:
+In the machine running the Python sync service, set:
 
 - **convex_url**: `https://<deployment>.convex.site/ingest_orders`
 - **CONVEX_API_KEY** (optional): same value you check in the HTTP handler.

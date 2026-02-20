@@ -1,7 +1,7 @@
-# Build the Aldelo → Convex sync service for Windows (for use with NSSM on the POS machine).
-# Run on Windows so the binary links against ODBC; download the artifact and copy to your POS machine.
+# Validate and build the Aldelo → Convex sync service (Python).
+# Builds a Windows .exe for use with NSSM on the POS machine.
 
-name: Build Windows sync service
+name: Sync service (Python)
 
 on:
   push:
@@ -17,8 +17,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: windows-latest
+  validate:
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: sync_service
@@ -27,31 +27,41 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          toolchain: stable
-          targets: x86_64-pc-windows-msvc,i686-pc-windows-msvc
+          python-version: '3.11'
 
-      - name: Cache Cargo
-        uses: Swatinem/rust-cache@v2
+      - name: Install dependencies (requests, tomli for Python < 3.11)
+        run: pip install requests tomli
+
+      - name: Validate syntax
+        run: python -m py_compile aldelo_convex_sync.py
+
+  build:
+    runs-on: windows-latest
+    needs: validate
+    defaults:
+      run:
+        working-directory: sync_service
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          workspace: sync_service
+          python-version: '3.11'
 
-      - name: Build release (64-bit)
-        run: cargo build --release --target x86_64-pc-windows-msvc
+      - name: Install dependencies
+        run: pip install -r requirements.txt pyinstaller
 
-      - name: Build release (32-bit)
-        run: cargo build --release --target i686-pc-windows-msvc
+      - name: Build executable
+        run: pyinstaller aldelo_convex_sync.spec
 
-      - name: Upload Windows x64 executable
+      - name: Upload Windows executable
         uses: actions/upload-artifact@v4
         with:
-          name: aldelo-convex-sync-windows-x64
-          path: sync_service/target/x86_64-pc-windows-msvc/release/aldelo-convex-sync.exe
-
-      - name: Upload Windows x86 executable
-        uses: actions/upload-artifact@v4
-        with:
-          name: aldelo-convex-sync-windows-x86
-          path: sync_service/target/i686-pc-windows-msvc/release/aldelo-convex-sync.exe
+          name: aldelo-convex-sync-windows
+          path: sync_service/dist/aldelo-convex-sync.exe

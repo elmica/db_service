@@ -6,8 +6,11 @@ out
 dist
 *.tgz
 
-# Rust/Cargo build output
+# Rust/Cargo build output (legacy)
 target/
+
+# testapp (local dev / reference)
+testapp/
 
 # code coverage
 coverage
