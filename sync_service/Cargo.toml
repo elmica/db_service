@@ -16,4 +16,5 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 [target.'cfg(windows)'.dependencies]
-odbc-api = "20"
+# Use ODBC 3.0 instead of 3.8 - the older Jet driver (Microsoft Access Driver (*.mdb)) doesn't support 3.8
+odbc-api = { version = "20", default-features = false }
