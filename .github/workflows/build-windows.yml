@@ -38,7 +38,7 @@ jobs:
       - name: Validate syntax
         run: python -m py_compile aldelo_convex_sync.py
 
-  build:
+  build-64:
     runs-on: windows-latest
     needs: validate
     defaults:
@@ -49,19 +49,49 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python (64-bit)
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          architecture: 'x64'
 
       - name: Install dependencies
         run: pip install -r requirements.txt pyinstaller
 
-      - name: Build executable
+      - name: Build executable (64-bit)
         run: pyinstaller aldelo_convex_sync.spec
 
-      - name: Upload Windows executable
+      - name: Upload Windows x64 executable
         uses: actions/upload-artifact@v4
         with:
-          name: aldelo-convex-sync-windows
+          name: aldelo-convex-sync-windows-x64
+          path: sync_service/dist/aldelo-convex-sync.exe
+
+  build-32:
+    runs-on: windows-latest
+    needs: validate
+    defaults:
+      run:
+        working-directory: sync_service
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python (32-bit)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          architecture: 'x86'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pyinstaller
+
+      - name: Build executable (32-bit)
+        run: pyinstaller aldelo_convex_sync.spec
+
+      - name: Upload Windows x86 executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: aldelo-convex-sync-windows-x86
           path: sync_service/dist/aldelo-convex-sync.exe

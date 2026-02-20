@@ -40,6 +40,7 @@ def load_config(config_path=None):
 
     return {
         "mdb_path": cfg.get("mdb_path", "C:\\Aldelo\\Data\\ChathamSandwich.mdb"),
+        "connection_string": cfg.get("connection_string"),  # optional; if set, use as-is (like testapp config.ini)
         "convex_url": os.environ.get("CONVEX_URL") or cfg.get("convex_url", ""),
         "cursor_path": cfg.get("cursor_path", "C:\\AldeloSync\\cursor.json"),
         "poll_interval_secs": int(cfg.get("poll_interval_secs", 5)),
@@ -71,14 +72,37 @@ def save_cursor(path, last_order_id):
     p.write_text(json.dumps({"last_order_id": last_order_id}, indent=2), encoding="utf-8")
 
 
-# ---------- DB: connection string ----------
+# ---------- DB: connection ----------
 
-def connection_string(mdb_path):
-    return (
-        f"DRIVER={{Microsoft Access Driver (*.mdb)}};"
-        f"DBQ={mdb_path};"
-        "READONLY=TRUE;"
-    )
+# Driver names to try (order matters; newer/64-bit first)
+ACCESS_DRIVERS = [
+    "Microsoft Access Driver (*.mdb, *.accdb)",
+    "Microsoft Access Driver (*.mdb)",
+    "Driver do Microsoft Access (*.mdb)",  # Portuguese locale
+]
+
+
+def connect_mdb(mdb_path=None, connection_string=None):
+    """Connect to MDB. Use connection_string if provided (like testapp config.ini), else build from mdb_path."""
+    if connection_string:
+        return pyodbc.connect(connection_string)
+    last_err = None
+    for driver in ACCESS_DRIVERS:
+        try:
+            conn_str = (
+                f"DRIVER={{{driver}}};"
+                f"DBQ={mdb_path};"
+                "READONLY=TRUE;"
+            )
+            return pyodbc.connect(conn_str)
+        except pyodbc.Error as e:
+            last_err = e
+            continue
+    raise RuntimeError(
+        "No Microsoft Access ODBC driver found. Install the Microsoft Access "
+        "Database Engine: https://www.microsoft.com/en-us/download/details.aspx?id=54920 "
+        "(use 32-bit driver for 32-bit exe, 64-bit for 64-bit). Or set connection_string in config. Original: " + str(last_err)
+    ) from last_err
 
 
 # ---------- DB: read batch ----------
@@ -259,9 +283,11 @@ def read_order_refunds(conn, min_order_id, max_order_id):
     return out
 
 
-def read_next_batch(mdb_path, last_order_id, batch_size):
-    conn_str = connection_string(mdb_path)
-    conn = pyodbc.connect(conn_str)
+def read_next_batch(config, last_order_id, batch_size):
+    conn = connect_mdb(
+        mdb_path=config.get("mdb_path"),
+        connection_string=config.get("connection_string"),
+    )
 
     headers = read_order_headers(conn, last_order_id, batch_size)
     if not headers:
@@ -320,7 +346,7 @@ class BackoffState:
 
 def run_one_poll(config, cursor, cursor_path):
     batch = read_next_batch(
-        config["mdb_path"],
+        config,
         cursor["last_order_id"],
         config["batch_size"],
     )

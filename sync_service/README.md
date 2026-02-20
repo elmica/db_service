@@ -15,7 +15,7 @@ See [NSSM.md](NSSM.md) for installing and running as a Windows service.
 2. Install dependencies: `pip install -r requirements.txt`
 
 **Option B: Standalone executable**
-1. Download `aldelo-convex-sync.exe` from the [GitHub Actions](../../actions) artifact (Build workflow).
+1. Download `aldelo-convex-sync.exe` from the [GitHub Actions](../../actions) artifact. Use **aldelo-convex-sync-windows-x86** (32-bit) if your testapp/aldelo.py works with the same config — the 64-bit exe needs a 64-bit ODBC driver.
 2. Copy it to your POS machine (e.g. `C:\AldeloSync\`).
 
 **Config (both options)**
@@ -25,6 +25,8 @@ See [NSSM.md](NSSM.md) for installing and running as a Windows service.
    - `cursor_path`: path for the cursor file (e.g. `C:\AldeloSync\cursor.json`)
 
 4. Optionally set `CONVEX_URL` and `CONVEX_API_KEY` in the environment.
+
+**If you get "Data source name not found" (IM002):** Your testapp uses 32-bit Python. Use the **x86 (32-bit)** artifact, or add `connection_string` to config.toml (copy the value from your working `config.ini`).
 
 ## Run
 

@@ -6,7 +6,7 @@ This service is designed to run on the POS machine (Windows) and read from the A
 
 - **Windows** with the Aldelo POS Jet (.mdb) database path known.
 - **Python 3.9+** installed and in PATH.
-- **Microsoft Access Database Engine** (ODBC driver) installed. Use the same bitness as Python (e.g. 64-bit driver for 64-bit Python).
+- **Microsoft Access Database Engine** (ODBC driver) installed. Use the same bitness as your exe or Python (64-bit exe → 64-bit driver). If you see "Data source name not found" (IM002), install the driver.
   - Download: [Microsoft Access Database Engine Redistributable](https://www.microsoft.com/en-us/download/details.aspx?id=54920)
 - **NSSM** (Non-Sucking Service Manager): [nssm.cc](https://nssm.cc) — extract and use `nssm.exe` (64-bit from win64 folder for 64-bit Python).
 
