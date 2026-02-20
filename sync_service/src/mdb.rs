@@ -67,7 +67,7 @@ pub fn read_next_batch(
 fn connection_string(path: &Path) -> String {
     let abs = path.canonicalize().unwrap_or_else(|_| path.to_path_buf());
     let s = abs.to_string_lossy().replace('\\', "\\\\");
-    format!("Driver={{Microsoft Access Driver (*.mdb, *.accdb)}};DBQ={};", s)
+    format!("Driver={{Microsoft Access Driver (*.mdb)}};DBQ={};READONLY=TRUE;", s)
 }
 
 #[cfg(windows)]
